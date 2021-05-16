@@ -1,5 +1,7 @@
 package com.example.esiea3a
 
 data class News(
-    val tittle: String
+    val id: Int,
+    val tittle: String,
+    val description :String
 )
