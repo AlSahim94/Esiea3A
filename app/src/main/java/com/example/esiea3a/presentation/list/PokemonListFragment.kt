@@ -1,9 +1,11 @@
 package com.example.esiea3a.presentation.list
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +26,8 @@ class PokemonListFragment : Fragment() {
 
     private val adapter = PokemonAdapter(listOf(), ::onClickedPokemon)
 
+    private val sharedPref = activity?.getSharedPreferences("app", Context.MODE_PRIVATE)
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -43,22 +47,48 @@ class PokemonListFragment : Fragment() {
 
         }
 
+        val list = getListFromCache()
+        if(list.isEmpty()){
+            callApi()
+        } else {
+            showList(list)
+        }
+    }
+
+    private fun getListFromCache(): List<Pokemon> {
+        sharedPref.
+        //TODO
+    }
+
+    private fun saveListIntoCache() {
+        //TODO("Not yet implemented")
+    }
+
+    private fun callApi() {
         Singleton.pokeApi.getPokemonList().enqueue(object : Callback<PokemonListResponse> {
             override fun onFailure(call: Call<PokemonListResponse>, t: Throwable) {
-                TODO("Not yet implemented")
+                //TODO("Not yet implemented")
             }
 
             override fun onResponse(call: Call<PokemonListResponse>, response: Response<PokemonListResponse>) {
                 if (response.isSuccessful && response.body() != null) {
                     val pokemonResponse = response.body()!!
-                    adapter.updateList(pokemonResponse.results)
+                    saveListIntoCache()
+                    showList(pokemonResponse.results)
                 }
             }
 
         })
     }
-    private fun onClickedPokemon(pokemon: Pokemon) {
-        findNavController().navigate(R.id.navigateToPokemonDetailFragment)
+
+    private fun showList(pokeList: List<Pokemon>) {
+        adapter.updateList(pokeList)
+    }
+
+    private fun onClickedPokemon(id: Int) {
+        findNavController().navigate(R.id.navigateToPokemonDetailFragment, bundleOf(
+                "pokemonId" to (id +1)
+        ))
 
     }
 }
