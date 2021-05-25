@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
@@ -21,17 +24,20 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
+import com.example.esiea3a.presentation.list.PokemonLoader as PokemonLoader
+import com.example.esiea3a.presentation.list.PokemonModel as PokemonModel
+import com.example.esiea3a.presentation.list.PokemonError as PokemonError
 
 
 class PokemonListFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var loader: ProgressBar
+    private lateinit var textViewError: TextView
 
     private val adapter = PokemonAdapter(listOf(), ::onClickedPokemon)
 
     private val viewModel: PokemonListViewModel by viewModels()
-
-    //private val sharedPref = activity?.getSharedPreferences("app", Context.MODE_PRIVATE)
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -45,49 +51,26 @@ class PokemonListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView = view.findViewById(R.id.pokemon_recyclerView)
+        loader = view.findViewById(R.id.pokemon_loader)
+        textViewError = view.findViewById(R.id.pokemon_error)
 
         recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = this@PokemonListFragment.adapter
-
         }
 
-        viewModel.pokeList.observe(viewLifecycleOwner, androidx.lifecycle.Observer{list ->
-            adapter.updateList(list)
+        viewModel.pokeList.observe(viewLifecycleOwner, androidx.lifecycle.Observer { pokemonModel ->
+            loader.isVisible = PokemonModel is PokemonLoader
+            textViewError.isVisible = PokemonModel is PokemonError
+
+                if (PokemonModel is PokemonSuccess) {
+                    adapter.updateList(pokemonModel.pokeList)
+                }
+
         })
 
     }
 
-
-        //val list = getListFromCache()
-        //if(list.isEmpty()){
-            //callApi()
-        //} else {
-            //showList(list)
-        //}
-    //}
-
-    //private fun getListFromCache(): List<Pokemon> {
-        //sharedPref.
-        //TODO
-    //}
-
-    //private fun saveListIntoCache() {
-        //TODO("Not yet implemented")
-    //}
-
-
-    //private fun callApi() {
-        //Singleton.pokeApi.getPokemonList().enqueue(object : Callback<PokemonListResponse> {
-            //override fun onFailure(call: Call<PokemonListResponse>, t: Throwable) {
-                //TODO("Not yet implemented")
-            //}
-
-
-
-    //private fun showList(pokeList: List<Pokemon>) {
-        //adapter.updateList(pokeList)
-    //}
 
     private fun onClickedPokemon(id: Int) {
         findNavController().navigate(R.id.navigateToPokemonDetailFragment, bundleOf(
