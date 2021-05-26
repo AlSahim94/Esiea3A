@@ -27,6 +27,7 @@ import java.util.*
 import com.example.esiea3a.presentation.list.PokemonLoader as PokemonLoader
 import com.example.esiea3a.presentation.list.PokemonModel as PokemonModel
 import com.example.esiea3a.presentation.list.PokemonError as PokemonError
+import com.example.esiea3a.presentation.list.PokemonSuccess as PokemonSuccess
 
 
 class PokemonListFragment : Fragment() {
@@ -60,10 +61,10 @@ class PokemonListFragment : Fragment() {
         }
 
         viewModel.pokeList.observe(viewLifecycleOwner, androidx.lifecycle.Observer { pokemonModel ->
-            loader.isVisible = PokemonModel is PokemonLoader
-            textViewError.isVisible = PokemonModel is PokemonError
+            loader.isVisible = pokemonModel is PokemonLoader
+            textViewError.isVisible = pokemonModel is PokemonError
 
-                if (PokemonModel is PokemonSuccess) {
+                if (pokemonModel is PokemonSuccess) {
                     adapter.updateList(pokemonModel.pokeList)
                 }
 
