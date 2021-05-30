@@ -3,11 +3,12 @@ package com.example.esiea3a.presentation.list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.esiea3a.data.PokeRepository
 import com.example.esiea3a.presentation.api.PokemonListResponse
 import retrofit2.Call
 import retrofit2.Response
 
-class PokemonListViewModel : ViewModel(){
+class PokemonListViewModel(val pokeRepository: PokeRepository) : ViewModel(){
 
     val pokeList : MutableLiveData<PokemonModel> = MutableLiveData()
 
@@ -18,6 +19,7 @@ class PokemonListViewModel : ViewModel(){
 
     private fun callApi() {
         pokeList.value = PokemonLoader
+
         Singleton.pokeApi.getPokemonList().enqueue(object: retrofit2.Callback<PokemonListResponse>{
             override fun onFailure(call: Call<PokemonListResponse>, t:Throwable){
                 pokeList.value = PokemonError
